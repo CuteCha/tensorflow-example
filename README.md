@@ -1,4 +1,4 @@
-# tensorflow-example 
+# tensorflow-example(Now support text classfication)
 
 ## using tf-record(suggeted)  
 see README.md in ./examples  
