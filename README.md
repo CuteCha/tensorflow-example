@@ -1,5 +1,11 @@
-##Stop update, and will all move to [tensorflow-exp](https://github.com/chenghuige/tensorflow-exp)
-# tensorflow-example
+# tensorflow-example 
+
+## using tf-record(suggeted)  
+see README.md in ./examples 
+
+## without tf-record(depreciated)  
+cd ./depreciated  
+
 basic tensorflow examples of doing binary classification
 will show auc result for each epoch
 It can deal with both dense or sparse input(like 3:2.5 1234:6.7)
