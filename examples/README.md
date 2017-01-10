@@ -10,7 +10,9 @@ How to do sparse clasfication training
 goto ./tf-record/sparse/ and do 'sh run.sh' #you may need to modify input data dir, any libsvm format or tlc format(with num_features after label) file is ok(one train and one test)  
 2. train and validate  
 goto ./text-classification/    
-sh run.sh #you may also need to modify tfrecord data dir    
+sh run.sh  
+you may need to modify tfrecord data dir  
+you may also need to change NUM_CLASSES = 34 NUM_FEATURES = 324510 according to your data, I will make these options to flags in future version.  
 
 the result looks like below:    
   loss: 3.498 precision@1: 0.031  
