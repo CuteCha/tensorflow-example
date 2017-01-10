@@ -7,7 +7,7 @@ only tested on tensorflow_version: 0.12.1
 
 How to do sparse clasfication training   
 1. gen tfrecord   
-goto ./tf-record/sparse/ and do 'sh run.sh' #you may need to modify input data dir, any libsvm format or tlc format(with num_features after label) file is ok(one train and one test)
+goto ./tf-record/sparse/ and do 'sh run.sh' #you may need to modify input data dir, any libsvm format or tlc format(with num_features after label) file is ok(one train and one test)  
 2. train and validate  
 goto ./text-classification/    
 sh run.sh #you may also need to modify tfrecord data dir    
