@@ -1,7 +1,8 @@
 # tensorflow-example 
 
 ## using tf-record(suggeted)  
-see README.md in ./examples 
+see README.md in ./examples  
+incase not find dependence, make sure set PYTHONPATH to include tensorflow_example/util so we can find gezi and melt
 
 ## without tf-record(depreciated)  
 cd ./depreciated  
