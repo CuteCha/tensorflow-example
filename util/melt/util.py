@@ -35,15 +35,14 @@ optimizers = {
   }
 
 def get_session(log_device_placement=False, allow_soft_placement=True):
-  if not hasattr(get_session, 'sess'):
+  if not hasattr(get_session, 'sess') or get_session.sess is None:
     config=tf.ConfigProto(
       allow_soft_placement=allow_soft_placement, 
       log_device_placement=log_device_placement)
     #NOTICE https://github.com/tensorflow/tensorflow/issues/2130 but 5000 will cause init problem!
     #config.operation_timeout_in_ms=50000   # terminate on long hangs
     get_session.sess = tf.Session(config=config)
-  else:
-    return get_session.sess
+  return get_session.sess
 
 def get_optimizer(name):
   if name in tf.contrib.layers.OPTIMIZER_CLS_NAMES:
@@ -87,26 +86,27 @@ except Exception:
     'lstm_block' : tf.contrib.rnn.LSTMBlockCell, #LSTMBlockCell is faster then LSTMCell
     }
 
-def create_rnn_cell(num_units, is_training, initializer=None, num_layers=1, keep_prob=1.0, Cell=None, cell_type='lstm'):
-  if Cell is None:
+def create_rnn_cell(num_units, is_training, initializer=None, num_layers=1, keep_prob=1.0, Cell=None, cell_type='lstm', scope=None):
+  with tf.variable_scope(scope or 'create_rnn_cell') as scope:
+    if Cell is None:
+      try:
+        Cell = rnn_cells.get(cell_type.lower(), tf.contrib.rnn.LSTMCell)
+      except Exception:
+        Cell = rnn_cells.get(cell_type.lower(), tf.nn.rnn_cell.LSTMCell)
     try:
-     Cell = rnn_cells.get(cell_type.lower(), tf.contrib.rnn.LSTMCell)
+      #cell = Cell(num_units, initializer=initializer, state_is_tuple=True)
+      cell = Cell(num_units, initializer=initializer)
     except Exception:
-      Cell = rnn_cells.get(cell_type.lower(), tf.nn.rnn_cell.LSTMCell)
-  try:
-    #cell = Cell(num_units, initializer=initializer, state_is_tuple=True)
-    cell = Cell(num_units, initializer=initializer)
-  except Exception:
-    #logging.warning('initializer not used as cell type not support, cell_type:%s'%cell_type)
-    cell = Cell(num_units)
-  if is_training and keep_prob < 1:
-    cell = tf.contrib.rnn.DropoutWrapper(
-        cell,
-        input_keep_prob=keep_prob,
-        output_keep_prob=keep_prob)
-  if num_layers > 1:
-    cell = tf.contrib.rnn.MultiRNNCell([cell] * num_layers, state_is_tuple=True)
-  return cell
+      #logging.warning('initializer not used as cell type not support, cell_type:%s'%cell_type)
+      cell = Cell(num_units)
+    if is_training and keep_prob < 1:
+      cell = tf.contrib.rnn.DropoutWrapper(
+          cell,
+          input_keep_prob=keep_prob,
+          output_keep_prob=keep_prob)
+    if num_layers > 1:
+      cell = tf.contrib.rnn.MultiRNNCell([cell] * num_layers, state_is_tuple=True)
+    return cell
 
 #-------for train flow
 def show_precision_at_k(result, k=1):
@@ -477,11 +477,39 @@ def set_global(key, value):
 #def epoch():
 #  return melt.flow.global_epoch
 
+#---------for flow
+def default_names(length):
+  names = ['metric%d'%(i - 1) for i in xrange(length)]
+  names[0] = 'loss'
+  return names 
+
+def adjust_names(values, names):
+  if names is None:
+    return default_names(len(values))
+  else:
+    if len(names) == len(values):
+      return names
+    elif len(names) + 1 == len(values):
+      names.insert(0, 'loss')
+      return names
+    else:
+      return default_names(len(values))
+
+
+def add_summarys(summary, values, names, suffix='', prefix=''):
+  for value, name in zip(values, names):
+    if suffix:
+      summary.value.add(tag='%s_%s'%(name, suffix), simple_value=float(value))
+    else:
+      if prefix:
+        summary.value.add(tag='%s_%s'%(prefix, name), simple_value=float(value))
+      else:
+        summary.value.add(tag=name, simple_value=float(value))
 
 #-----------deal with text  TODO move 
 import melt
-
 def pad(text, start_id=None, end_id=None):
+  print('Pad with start_id', start_id, ' end_id', end_id)
   need_start_mark = start_id is not None
   need_end_mark = end_id is not None
   if not need_start_mark and not need_end_mark:
@@ -493,20 +521,15 @@ def pad(text, start_id=None, end_id=None):
   sequence_length = melt.length(text)
 
   if not need_start_mark:
-    text = tf.concat(1, [text, zero_pad])
+   text = tf.concat([text, zero_pad], 1)
   else:
-    if start_id == 0:
-      if need_end_mark:
-        text = tf.concat(1, [zero_pad, text, zero_pad])
-      else:
-        text = tf.concat(1, [zero_pad, text])
-    else:
+    if need_start_mark:
       start_pad = zero_pad + start_id
       if need_end_mark:
-        text = tf.concat(1, [start_pad, text, zero_pad])
+        text = tf.concat([start_pad, text, zero_pad], 1)
       else:
-        text = tf.concat(1, [start_pad, text])
-    sequence_length += 1
+        text = tf.concat([start_pad, text], 1)
+      sequence_length += 1
 
   if need_end_mark:
     text = melt.dynamic_append_with_length(

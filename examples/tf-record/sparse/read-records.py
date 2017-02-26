@@ -79,9 +79,9 @@ def read_records():
 
     # The op for initializing the variables.  
     #notice you need to use initialize_local_variables other wise if you set num_epochs not None will fail
-    init_op = tf.group(tf.initialize_all_variables(),
-                       tf.initialize_local_variables())
-
+    init_op = tf.group(tf.global_variables_initializer(),
+                    tf.local_variables_initializer())
+    
     sess = tf.InteractiveSession()
     # Initialize the variables (the trained variables and the
     # epoch counter).

@@ -58,21 +58,12 @@ def forward(inputs,
   similary as melt.slim.layers.mlp but the first step(from input to first hidden adjusted so input can be sparse)
   """
 
+  assert len(hiddens) >= 1, "must at least contain one hidden layer"
+
   scope = 'mlp' if scope is None else scope
   with tf.variable_scope(scope):
-    if len(hiddens) == 0:
-      #logistic regression
-      return melt.linear(inputs, 
-                     num_outputs, 
-                     input_dim=input_dim,
-                     weights_initializer=weights_initializer,
-                     weights_regularizer=weights_regularizer,
-                     biases_initializer=biases_initializer,
-                     biases_regularizer=biases_regularizer,
-                     scope='linear')
-
     outputs = melt.layers.fully_connected(inputs, 
-                                   hiddens[0], 
+                                   num_outputs, 
                                    input_dim=input_dim,
                                    activation_fn=activation_fn,
                                    weights_initializer=weights_initializer,

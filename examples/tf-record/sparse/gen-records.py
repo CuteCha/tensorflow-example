@@ -17,6 +17,11 @@ from __future__ import print_function
 import sys,os
 
 import tensorflow as tf
+flags = tf.app.flags
+FLAGS = flags.FLAGS 
+
+flags.DEFINE_string('label_type', 'int', '')
+
 import numpy as np
 
 _float_feature = lambda v: tf.train.Feature(float_list=tf.train.FloatList(value=v))
@@ -29,7 +34,8 @@ def main(argv):
     if num % 10000 == 0:
       print('%d lines done'%num)
     l = line.rstrip().split()
-    label = int(l[0])
+
+    label = int(l[0]) if FLAGS.label_type == 'int' else float(l[0])
     
     #input can be libsmv or tlc format, for tlc format it contatins one col of num_features here will ignore
     start = 1
@@ -46,8 +52,9 @@ def main(argv):
       indexes.append(int(index))
       values.append(float(value))
     
+    label_ = _int_feature([label]) if FLAGS.label_type == 'int' else _float_feature([label])
     example = tf.train.Example(features=tf.train.Features(feature={
-        'label': _int_feature([label]),
+        'label': label_,
         'index': _int_feature(indexes),
         'value': _float_feature(values)
         }))

@@ -23,8 +23,8 @@ def tf_flow(train_once, num_steps=None, sess=None):
   Args:
   train_once: function with 2 inputs sess and step
   """
-  init_op = tf.group(tf.initialize_all_variables(),
-                       tf.initialize_local_variables())
+  init_op = tf.group(tf.global_variables_initializer(),
+                    tf.local_variables_initializer())
   if sess is None:
     sess = tf.InteractiveSession()
   sess.run(init_op)
@@ -128,6 +128,7 @@ def tf_train_flow(train_once,
     except Exception:
       init_op = tf.group(tf.initialize_all_variables(),
                          tf.initialize_local_variables())
+
     sess.run(init_op)
   
   if save_interval_epochs and num_steps_per_epoch:
@@ -152,7 +153,7 @@ def tf_train_flow(train_once,
       if save_model and step:
         #step 0 is also saved! actually train one step and save
         if step % save_interval_steps == 0:
-          timer = gezi.Timer('save model step %d'%step)
+          timer = gezi.Timer('save model step %d to %s'%(step, checkpoint_path))
           saver.save(sess, checkpoint_path, global_step=step)
           timer.print()
         if save_interval_epochs and num_steps_per_epoch and step % (num_steps_per_epoch * save_interval_epochs) == 0:

@@ -17,17 +17,16 @@ import melt
 from melt.models import mlp
 
 
-g_num_features, g_num_classes =  -1, -1
+g_num_features = -1
 
-def set_input_info(num_features, num_classes):
-  global g_num_features, g_num_classes
+def set_input_info(num_features):
+  global g_num_features
   g_num_features = num_features
-  g_num_classes = num_classes
 
 def predict(X):
   return mlp.forward(X, 
                     input_dim=g_num_features, 
-                    num_outputs=g_num_classes, 
+                    num_outputs=1, 
                     hiddens=[200,100,50])
                     #hiddens=[200])
 
@@ -37,9 +36,13 @@ def build_graph(X, y):
   
   #-----------for classification we can set loss function and evaluation metrics,so only forward graph change
   #---set loss function
-  loss = melt.sparse_softmax_cross_entropy(py_x, y)
+  
+  #TODO: not work shapes (64, ?) (?, ?) not incompatibale
+  #loss = tf.losses.mean_squared_error(py_x, y)
+  loss = tf.reduce_mean(tf.pow(py_x - y, 2))
 
   #---choose evaluation metrics
-  accuracy = melt.precision_at_k(py_x, y, 1)
+  correct_prediction = tf.equal(tf.cast(py_x, tf.int32), tf.cast(y, tf.int32))
+  accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
   return loss, accuracy

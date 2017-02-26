@@ -1,14 +1,10 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # ==============================================================================
-#          \file   __init__.py
+#          \file   seq2seq.py
 #        \author   chenghuige  
-#          \date   2016-08-16 17:12:35.563389
+#          \date   2016-12-20 11:24:54.024011
 #   \Description  
 # ==============================================================================
 
   
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-import melt.models.mlp 

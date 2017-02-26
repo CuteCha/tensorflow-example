@@ -62,7 +62,7 @@ def forward(inputs,
   with tf.variable_scope(scope):
     if len(hiddens) == 0:
       #logistic regression
-      return melt.linear(inputs, 
+      return melt.linear(outputs, 
                      num_outputs, 
                      input_dim=input_dim,
                      weights_initializer=weights_initializer,
@@ -72,7 +72,7 @@ def forward(inputs,
                      scope='linear')
 
     outputs = melt.layers.fully_connected(inputs, 
-                                   hiddens[0], 
+                                   num_outputs, 
                                    input_dim=input_dim,
                                    activation_fn=activation_fn,
                                    weights_initializer=weights_initializer,

@@ -27,35 +27,6 @@ import melt
 
 projector_config = tf.contrib.tensorboard.plugins.projector.ProjectorConfig()
 
-def _default_names(length):
-  names = ['metric%d'%(i - 1) for i in xrange(length)]
-  names[0] = 'loss'
-  return names 
-
-def _adjust_names(values, names):
-  if names is None:
-    return _default_names(len(values))
-  else:
-    if len(names) == len(values):
-      return names
-    elif len(names) + 1 == len(values):
-      names.insert(0, 'loss')
-      return names
-    else:
-      return _default_names(len(values))
-
-
-def _add_summarys(summary, values, names, suffix='', prefix=''):
-  for value, name in zip(values, names):
-    if suffix:
-      summary.value.add(tag='%s_%s'%(name, suffix), simple_value=float(value))
-    else:
-      if prefix:
-        summary.value.add(tag='%s_%s'%(prefix, name), simple_value=float(value))
-      else:
-        summary.value.add(tag=name, simple_value=float(value))
-
-
 def train_once(sess, 
                step, 
                ops, 
@@ -102,8 +73,24 @@ def train_once(sess,
       eval_names = names 
 
     feed_dict = {} if gen_feed_dict is None else gen_feed_dict()
+    
     results = sess.run(ops, feed_dict=feed_dict) 
 
+    # #--------trace debug
+    # if step == 210:
+    #   run_metadata = tf.RunMetadata()
+    #   results = sess.run(
+    #         ops,
+    #         feed_dict=feed_dict,
+    #         options=tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE),
+    #         run_metadata=run_metadata)
+    #   from tensorflow.python.client import timeline
+    #   trace = timeline.Timeline(step_stats=run_metadata.step_stats)
+
+    #   trace_file = open('timeline.ctf.json', 'w')
+    #   trace_file.write(trace.generate_chrome_trace_format())
+    
+    
     #reults[0] assume to be train_op
     results = results[1:]
     
@@ -138,7 +125,7 @@ def train_once(sess,
 
       if print_avg_loss:
         #info.write('train_avg_metrics:{} '.format(melt.value_name_list_str(train_average_loss, names)))
-        names_ = _adjust_names(train_average_loss, names)
+        names_ = melt.adjust_names(train_average_loss, names)
         info.write('train_avg_metrics:{} '.format(melt.parse_results(train_average_loss, names_)))
         #info.write('train_avg_loss: {} '.format(train_average_loss))
       
@@ -172,7 +159,7 @@ def train_once(sess,
       
       info = BytesIO()
       
-      names_ = _adjust_names(results, names)
+      names_ = melt.adjust_names(results, names)
 
       train_average_loss_str = ''
       if print_avg_loss and interval_steps != eval_interval_steps:
@@ -206,7 +193,7 @@ def train_once(sess,
       eval_loss = gezi.get_singles(eval_results)
       assert len(eval_loss) > 0
       if eval_stop is True: stop = True
-      eval_names_ = _adjust_names(eval_loss, eval_names)
+      eval_names_ = melt.adjust_names(eval_loss, eval_names)
 
       melt.set_global('eval_loss', melt.parse_results(eval_loss, eval_names_))
     elif interval_steps != eval_interval_steps:
@@ -218,14 +205,19 @@ def train_once(sess,
       
       if not hasattr(train_once, 'summary_op'):
         try:
-          train_once.summary_op = tf.summary.merge()
+          train_once.summary_op = tf.summary.merge_all()
         except Exception:
           train_once.summary_op = tf.merge_all_summaries()
 
         melt.print_summary_ops()
 
-        train_once.summary_train_op = tf.merge_all_summaries(key=melt.MonitorKeys.TRAIN)
-        train_once.summary_writer = tf.train.SummaryWriter(log_dir, sess.graph)
+        try:
+          train_once.summary_train_op = tf.summary.merge_all(key=melt.MonitorKeys.TRAIN)
+          train_once.summary_writer = tf.summary.FileWriter(log_dir, sess.graph)
+        except Exception:
+          train_once.summary_train_op = tf.merge_all_summaries(key=melt.MonitorKeys.TRAIN)
+          train_once.summary_writer = tf.train.SummaryWriter(log_dir, sess.graph)
+
         tf.contrib.tensorboard.plugins.projector.visualize_embeddings(train_once.summary_writer, projector_config)
 
       summary = tf.Summary()
@@ -247,14 +239,15 @@ def train_once(sess,
         summary_str = sess.run(train_once.summary_op, feed_dict=eval_feed_dict) if train_once.summary_op is not None else ''
         #all single value results will be add to summary here not using tf.scalar_summary..
         summary.ParseFromString(summary_str)
-        _add_summarys(summary, eval_results, eval_names_, suffix='eval')
+        melt.add_summarys(summary, eval_results, eval_names_, suffix='eval')
 
-      _add_summarys(summary, train_average_loss, names_, suffix='train_avg%dsteps'%eval_interval_steps) 
+      melt.add_summarys(summary, train_average_loss, names_, suffix='train_avg%dsteps'%eval_interval_steps) 
 
       if metric_evaluate:
-        _add_summarys(summary, evaluate_results, evaluate_names, prefix='evaluate')
+        melt.add_summarys(summary, evaluate_results, evaluate_names, prefix='evaluate')
       
       train_once.summary_writer.add_summary(summary, step)
+      train_once.summary_writer.flush()
 
       #timer_.print()
     

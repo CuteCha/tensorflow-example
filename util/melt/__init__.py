@@ -30,3 +30,5 @@ from melt.metrics import *
 import melt.apps
 
 import melt.rnn 
+
+import melt.seq2seq

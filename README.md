@@ -1,6 +1,6 @@
 # tensorflow-example(Now support text classfication)
 
-## using tf-record(suggeted)  
+## using tf-record(suggeted, only tested with tf.__version__ 1.0.0)  
 see README.md in ./examples  
 incase not find dependence, make sure set PYTHONPATH to include tensorflow_example/util so we can find gezi and melt
 
@@ -76,41 +76,3 @@ I tensorflow/core/common_runtime/local_session.cc:45] Local session inter op par
 4 auc: 0.657326531323 cost: 0.599433459447
 
 5 auc: 0.666575623414 cost: 0.598856064529
-
-6 auc: 0.671990014639 cost: 0.598072590816
-
-7 auc: 0.675956442936 cost: 0.596850153855
-
-8 auc: 0.681129512174 cost: 0.594744671454
-
-9 auc: 0.689568680575 cost: 0.591011970184
-
-10 auc: 0.70265083004 cost: 0.584730529957
-
-11 auc: 0.720751242654 cost: 0.575319047846
-
-12 auc: 0.740525668112 cost: 0.563041782476
-
-13 auc: 0.756397606412 cost: 0.548790696159
-
-14 auc: 0.76745782664 cost: 0.533633556673
-
-15 auc: 0.776115284883 cost: 0.518648754985
-
-16 auc: 0.783683301767 cost: 0.504702218341
-
-17 auc: 0.79058754946 cost: 0.492255532423
-
-18 auc: 0.796831772334 cost: 0.481419827863
-
-19 auc: 0.802349672543 cost: 0.472143309749
-
-20 auc: 0.807102186144 cost: 0.464346827091
-
-21 auc: 0.811092646634 cost: 0.457953127862
-
-22 auc: 0.814318813594 cost: 0.452874061637
-
-23 auc: 0.816884839449 cost: 0.449003176388
-
-24 auc: 0.818881302313 cost: 0.446225956373

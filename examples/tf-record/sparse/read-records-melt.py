@@ -16,14 +16,17 @@ import tensorflow as tf
 from gezi import Timer
 import melt 
 
+import functools
+
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 
 flags.DEFINE_integer('batch_size', 5, 'Batch size.')
-flags.DEFINE_integer('num_epochs', 2, 'Number of epochs to run trainer.')
+#flags.DEFINE_integer('num_epochs', 2, 'Number of epochs to run trainer.')
 flags.DEFINE_integer('num_preprocess_threads', 12, '')
 flags.DEFINE_boolean('batch_join', True, '')
 flags.DEFINE_boolean('shuffle', True, '')
+flags.DEFINE_string('label_type', 'int', '')
 
 def read_once(sess, step, ops):
   X, y = sess.run(ops)
@@ -39,7 +42,8 @@ from melt.flow import tf_flow
 def read_records():
   # Tell TensorFlow that the model will be built into the default Graph.
   inputs = melt.read_sparse.inputs
-  decode = melt.libsvm_decode.decode
+  label_type = tf.int32 if FLAGS.label_type == 'int' else tf.float32
+  decode = functools.partial(melt.libsvm_decode.decode, label_type=label_type)
 
   with tf.Graph().as_default():
     X, y = inputs(

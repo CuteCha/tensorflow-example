@@ -25,7 +25,6 @@ flags.DEFINE_boolean('shuffle', True, '')
 flags.DEFINE_string('model_dir', '/home/gezi/temp/text-classification', '')
 
 #--------- modify below according to your data!
-flags.DEFINE_integer('num_classes', -1, '')
 flags.DEFINE_integer('num_features', -1, '')
 
 import gezi
@@ -33,12 +32,13 @@ import melt
 logging = melt.logging
 
 import model
-decode = melt.libsvm_decode.decode
+import functools
+decode = functools.partial(melt.libsvm_decode.decode, label_type=tf.float32)
 
 def train():
-  assert FLAGS.num_classes > 0 and FLAGS.num_features > 0, 'you must pass num_classes and num_features according to your data'
-  print('num_features:', FLAGS.num_features, 'num_classes:', FLAGS.num_classes)
-  model.set_input_info(num_features=FLAGS.num_features, num_classes=FLAGS.num_classes)
+  assert FLAGS.num_features > 0, 'you must pass num_features according to your data'
+  print('num_features:', FLAGS.num_features)
+  model.set_input_info(num_features=FLAGS.num_features)
 
   trainset = sys.argv[1]
   inputs = melt.shuffle_then_decode.inputs

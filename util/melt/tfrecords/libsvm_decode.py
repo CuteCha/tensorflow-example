@@ -15,7 +15,7 @@ import tensorflow as tf
 
 #notice heare use parse_example not parse single example for it
 #is used in sparse record reading flow, suffle then deocde
-def decode(batch_serialized_examples):
+def decode(batch_serialized_examples, label_type=tf.int64, index_type=tf.int64, value_type=tf.float32):
   """
   decode batch_serialized_examples for use in parse libsvm fomrat sparse tf-record
   Returns:
@@ -24,9 +24,9 @@ def decode(batch_serialized_examples):
   features = tf.parse_example(
       batch_serialized_examples,
       features={
-          'label' : tf.FixedLenFeature([], tf.int64),
-          'index' : tf.VarLenFeature(tf.int64),
-          'value' : tf.VarLenFeature(tf.float32),
+          'label' : tf.FixedLenFeature([], label_type),
+          'index' : tf.VarLenFeature(index_type),
+          'value' : tf.VarLenFeature(value_type),
       })
 
   label = features['label']
@@ -34,4 +34,5 @@ def decode(batch_serialized_examples):
   value = features['value']
 
   #return as X,y
+  print(index, value)
   return (index, value), label
