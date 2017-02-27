@@ -1,4 +1,4 @@
-# tensorflow-example(Now support text classfication)
+# tensorflow-example(Now support text/sparse-input classfication/regression)
 
 ## using tf-record(suggeted, only tested with tf.__version__ 1.0.0)  
 see README.md in ./examples  
