@@ -6,7 +6,9 @@
 *checkpoint.ipynb
 *.swp
 *.crc
+*.vshistory
 .localhistory
+.vs
 model.ckpt*
 /data
 /build
