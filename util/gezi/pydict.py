@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 #coding=gbk
 ############################################
-# [Author]: jianglianxin, jianglianxin@baidu.com
+# [Author]: jianglianxin, jianglianxin
 # [Date]:	2013/01/15
 ############################################
 import pydictmatch

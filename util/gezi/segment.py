@@ -15,9 +15,9 @@ from __future__ import print_function
 import tensorflow as tf
 
 import gezi.nowarning
+
 import libsegment
 seg = libsegment.Segmentor
-
 
 import gezi
 #should use full path

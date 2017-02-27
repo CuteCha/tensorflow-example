@@ -16,15 +16,18 @@ from __future__ import print_function
 import sys
 import glob as local_glob
 
-import pyhdfs
+try:
+  import pyhdfs
+except Exception:
+  pass
 
 HDFS_START = 'hdfs://'
 
 #@TODO config ?
-NODE_ADDRESS = 'nj01-nanling-hdfs.dmop.baidu.com'
-NODE_PORT = 54310
-USER_NAME = 'tuku'
-USE_PASSWORD = 'tuku1234'
+NODE_ADDRESS = ''
+NODE_PORT = 0
+USER_NAME = ''
+USE_PASSWORD = ''
 
 START_DIR='/app/'
 

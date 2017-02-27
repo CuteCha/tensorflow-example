@@ -17,13 +17,13 @@ from gezi.nowarning import *
 from gezi.gezi_util import * 
 from gezi.avg_score import *
 from gezi.util import * 
-
-from gezi.libgezi_util import *
-import gezi.libgezi_util as libgezi_util
-from gezi.segment import * 
-
-import gezi.bigdata_util
-
 from gezi.rank_metrics import *
 
-from gezi.pydict import *
+try:
+  from gezi.libgezi_util import *
+  import gezi.libgezi_util as libgezi_util
+  from gezi.segment import *
+  import gezi.bigdata_util
+  from gezi.pydict import *
+except Exception:
+  pass

@@ -20,11 +20,9 @@ now has libgezi_util and segment  depend on boost.python
 """
 
 #@FIXME this might casue double free at the end, conflict with numpy in virutal env
-try:
-  import libstring_util as su 
-  
-  def get_single_cns(text):
-    return su.to_cnvec(su.extract_chinese(text)) 
-except Exception:
-  def get_single_cns(text):
-    pass
+
+import libstring_util as su 
+
+def get_single_cns(text):
+  return su.to_cnvec(su.extract_chinese(text)) 
+
