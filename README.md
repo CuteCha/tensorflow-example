@@ -1,4 +1,5 @@
 # tensorflow-example(Now support text/sparse-input classfication/regression)
+stop update, you can find new code in hasky/applications
 
 ## using tf-record(suggeted, only tested with tf.__version__ 1.0.0)  
 see README.md in ./examples  
