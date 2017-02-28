@@ -35,6 +35,11 @@ import model
 import functools
 decode = functools.partial(melt.libsvm_decode.decode, label_type=tf.float32)
 
+def gen_predict_graph():
+  predictor = model.Predictor()
+  score = model.predict(predictor.X)
+  tf.add_to_collection('score', score)
+
 def train():
   assert FLAGS.num_features > 0, 'you must pass num_features according to your data'
   print('num_features:', FLAGS.num_features)
@@ -65,6 +70,7 @@ def train():
   with tf.variable_scope('main') as scope:
     loss, accuracy = model.build_graph(X, y)
     scope.reuse_variables()
+    gen_predict_graph()
     if train_with_validation:
       eval_loss, eval_accuracy = model.build_graph(eval_X, eval_y)
       eval_ops = [eval_loss, eval_accuracy]
@@ -76,8 +82,7 @@ def train():
              deal_results=melt.show_precision_at_k,
              eval_ops=eval_ops,
              deal_eval_results= lambda x: melt.print_results(x, names=['precision@1']),
-             model_dir=FLAGS.model_dir
-             )
+             model_dir=FLAGS.model_dir)
 
 def main(_):
   logging.set_logging_path(gezi.get_dir(FLAGS.model_dir))
