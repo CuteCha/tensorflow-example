@@ -30,8 +30,8 @@ def get_model_dir_and_path(model_dir, model_name=None):
     model_path = os.path.join(model_dir, os.path.basename(ckpt.model_checkpoint_path))
   else:
     model_path = model_dir if model_name is None else os.path.join(model_dir, model_name)
-  if not os.path.exists(model_path):
-    raise ValueError(model_path)
+  #if not os.path.exists(model_path):
+  #  raise ValueError(model_path)
   return os.path.dirname(model_path), model_path
 
 class Predictor(object):
